@@ -141,6 +141,7 @@
 
     State.started = true;
     State.paused = false;
+    State.ended = false;
     State.day = 0;
     State.dna = 8;
     State.cure = 0;
@@ -761,14 +762,23 @@
 
   // ───────────────────────────── end of game ─────────────────────────────
   function checkEnd() {
+    if (State.ended) return;
     const t = totals();
     if (State.cure >= 100) {
       endGame(false, `A vaccine was deployed. ${fmt(t.healthy + t.inf)} people survived.`);
       return;
     }
-    // c.infected and c.healthy can decay to sub-person float residuals; treat <1 person as 0.
+    // Total annihilation: every host accounted for.
     if (t.healthy < 1 && t.inf < 1 && t.dead > 0) {
       endGame(true, `${State.plagueName} consumed every human host.`);
+      return;
+    }
+    // Civilizational collapse: multiplicative SIR-style decay leaves tiny pockets of survivors
+    // that the disease can no longer reach. When ≥99.9% of humanity is dead and the active
+    // outbreak has run its course, declare the pathogen the winner.
+    const totalPop = t.healthy + t.inf + t.dead;
+    if (totalPop > 0 && t.inf < 1 && t.dead / totalPop >= 0.999) {
+      endGame(true, `Civilization collapsed. The last ${fmt(t.healthy)} stragglers cannot rebuild.`);
       return;
     }
     // If everyone has been infected at some point AND lethality is too low to ever finish, end anyway
@@ -779,6 +789,7 @@
 
   function endGame(won, msg) {
     State.paused = true;
+    State.ended = true;
     const t = totals();
     $('endTitle').textContent = won ? 'Victory' : 'Defeat';
     $('endText').textContent = won
