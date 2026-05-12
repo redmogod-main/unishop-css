@@ -324,6 +324,10 @@
       c.infected -= deaths;
       c.dead += deaths;
 
+      // Round sub-person float residuals to 0 once the country is "spent".
+      if (c.healthy > 0 && c.healthy < 1) { c.infected += c.healthy; c.healthy = 0; }
+      if (c.infected > 0 && c.infected < 1 && c.healthy === 0) { c.dead += c.infected; c.infected = 0; }
+
       tryDetect(c);
       tryClose(c);
 
@@ -762,12 +766,13 @@
       endGame(false, `A vaccine was deployed. ${fmt(t.healthy + t.inf)} people survived.`);
       return;
     }
-    if (t.healthy === 0 && t.inf === 0 && t.dead > 0) {
+    // c.infected and c.healthy can decay to sub-person float residuals; treat <1 person as 0.
+    if (t.healthy < 1 && t.inf < 1 && t.dead > 0) {
       endGame(true, `${State.plagueName} consumed every human host.`);
       return;
     }
-    // If everyone has been infected at some point AND lethality is high enough, accelerate end
-    if (t.healthy === 0 && t.dead > 0 && t.inf > 0 && State.stats.lethality < 5 && State.day > 4000) {
+    // If everyone has been infected at some point AND lethality is too low to ever finish, end anyway
+    if (t.healthy < 1 && t.dead > 0 && t.inf >= 1 && State.stats.lethality < 5 && State.day > 4000) {
       endGame(true, `${State.plagueName} infected everyone but the survivors carried on.`);
     }
   }
