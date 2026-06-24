@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1280" />
+  <title>PLAGUE — a Plague Inc-style game</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="topbar">
+      <div class="brand">
+        <span class="brand-mark"></span>
+        <span class="brand-name">PLAGUE</span>
+        <span class="brand-sub" id="plagueLabel">Patient Zero</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><span class="stat-label">Day</span><span class="stat-value" id="day">0</span></div>
+        <div class="stat"><span class="stat-label">Infected</span><span class="stat-value stat-infected" id="infectedCount">0</span></div>
+        <div class="stat"><span class="stat-label">Dead</span><span class="stat-value stat-dead" id="deadCount">0</span></div>
+        <div class="stat"><span class="stat-label">Healthy</span><span class="stat-value stat-healthy" id="healthyCount">0</span></div>
+        <div class="stat dna"><span class="stat-label">DNA</span><span class="stat-value" id="dna">0</span></div>
+      </div>
+      <div class="controls">
+        <button id="pauseBtn" class="ctl">Pause</button>
+        <button class="ctl speed-btn" data-speed="1" title="Slow">&#9658;</button>
+        <button class="ctl speed-btn active" data-speed="2" title="Normal">&#9658;&#9658;</button>
+        <button class="ctl speed-btn" data-speed="3" title="Fast">&#9658;&#9658;&#9658;</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="world">
+        <canvas id="worldCanvas" width="1000" height="500"></canvas>
+        <div id="bubbles"></div>
+        <div id="news"></div>
+        <div id="legend">
+          <div class="lg"><span class="dot dot-h"></span>Healthy</div>
+          <div class="lg"><span class="dot dot-i"></span>Infected</div>
+          <div class="lg"><span class="dot dot-d"></span>Devastated</div>
+          <div class="lg"><span class="dot dot-c"></span>Closed</div>
+        </div>
+      </section>
+
+      <aside id="sidebar">
+        <div class="bars">
+          <div class="bar"><span class="bar-label">Infectivity</span>
+            <div class="meter"><div id="infBar" class="meter-fill inf"></div></div>
+            <span class="bar-num" id="infNum">0</span>
+          </div>
+          <div class="bar"><span class="bar-label">Severity</span>
+            <div class="meter"><div id="sevBar" class="meter-fill sev"></div></div>
+            <span class="bar-num" id="sevNum">0</span>
+          </div>
+          <div class="bar"><span class="bar-label">Lethality</span>
+            <div class="meter"><div id="lethBar" class="meter-fill leth"></div></div>
+            <span class="bar-num" id="lethNum">0</span>
+          </div>
+          <div class="bar cure-bar"><span class="bar-label">Cure</span>
+            <div class="meter"><div id="cureBar" class="meter-fill cure"></div></div>
+            <span class="bar-num" id="cureNum">0%</span>
+          </div>
+        </div>
+
+        <nav class="tabs">
+          <button class="tab-btn active" data-tab="disease">Disease</button>
+          <button class="tab-btn" data-tab="world">World</button>
+          <button class="tab-btn" data-tab="stats">Stats</button>
+        </nav>
+
+        <div class="tab-content" id="tab-disease">
+          <div class="evo-categories">
+            <button class="cat-btn active" data-cat="transmission">Transmission</button>
+            <button class="cat-btn" data-cat="symptoms">Symptoms</button>
+            <button class="cat-btn" data-cat="abilities">Abilities</button>
+          </div>
+          <div id="evolutionList" class="evo-list"></div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-world">
+          <input id="countryFilter" type="text" placeholder="Filter countries..." />
+          <div id="countryList" class="country-list"></div>
+        </div>
+
+        <div class="tab-content hidden" id="tab-stats">
+          <div id="statsView" class="stats-view"></div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <div id="startScreen" class="overlay">
+    <div class="panel">
+      <h1 class="big">PLAGUE</h1>
+      <p class="tag">The world is healthy. You are not.</p>
+      <label class="field">
+        <span>Plague name</span>
+        <input id="plagueName" maxlength="24" value="Patient Zero" />
+      </label>
+      <label class="field">
+        <span>Starting country</span>
+        <select id="startCountry"></select>
+      </label>
+      <label class="field">
+        <span>Difficulty</span>
+        <select id="difficulty">
+          <option value="casual">Casual</option>
+          <option value="normal" selected>Normal</option>
+          <option value="brutal">Brutal</option>
+        </select>
+      </label>
+      <button id="startBtn" class="primary">Begin Infection</button>
+      <p class="hint">Tip: click red DNA bubbles on the map to collect DNA. Spend DNA to evolve traits before the world finds a cure.</p>
+    </div>
+  </div>
+
+  <div id="endScreen" class="overlay hidden">
+    <div class="panel">
+      <h1 id="endTitle" class="big">Victory</h1>
+      <p id="endText" class="tag"></p>
+      <div id="endStats" class="end-stats"></div>
+      <button id="restartBtn" class="primary">Play again</button>
+    </div>
+  </div>
+
+  <div id="tooltip" class="tooltip hidden"></div>
+
+  <script src="world.js"></script>
+  <script src="evolutions.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
